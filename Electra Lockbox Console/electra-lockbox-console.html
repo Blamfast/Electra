@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Electra Lockbox Console</title>
+  <style>
+    :root{
+      --electra-deep:#004897;
+      --electra-neon:#3DB9EB;
+      --electra-white:#FFFFFF;
+      --bg0:#030813;
+      --bg1:#061126;
+      --panel:rgba(6,17,38,.72);
+      --panel2:rgba(6,17,38,.45);
+      --line:rgba(61,185,235,.20);
+      --muted:rgba(255,255,255,.70);
+      --shadow: 0 28px 70px rgba(0,0,0,.55);
+      --glow: 0 0 18px rgba(61,185,235,.35), 0 0 44px rgba(61,185,235,.16);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--electra-white);
+      background:
+        radial-gradient(900px 560px at 12% 18%, rgba(0,72,151,.34), transparent 60%),
+        radial-gradient(900px 620px at 78% 22%, rgba(61,185,235,.20), transparent 55%),
+        radial-gradient(900px 820px at 55% 92%, rgba(0,72,151,.22), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    .grid{
+      position:fixed; inset:0;
+      background-image:
+        linear-gradient(to right, rgba(61,185,235,.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(61,185,235,.05) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,.9) 12%, rgba(0,0,0,.45) 60%, transparent 88%);
+      pointer-events:none;
+      opacity:.8;
+    }
+    .scanlines{
+      position:fixed; inset:0;
+      background: repeating-linear-gradient(to bottom, rgba(255,255,255,.02) 0px, rgba(255,255,255,.02) 1px, rgba(0,0,0,0) 3px, rgba(0,0,0,0) 6px);
+      opacity:.28;
+      mix-blend-mode: overlay;
+      pointer-events:none;
+    }
+    header{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 22px 26px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .mark{
+      width: 42px; height: 42px;
+      border-radius: 14px;
+      border: 1px solid rgba(61,185,235,.22);
+      background: linear-gradient(180deg, rgba(6,17,38,.65), rgba(6,17,38,.35));
+      box-shadow: var(--glow);
+      display:grid; place-items:center;
+      font-family: var(--mono);
+      letter-spacing:.12em;
+      color: rgba(61,185,235,.92);
+      font-weight: 800;
+    }
+    .brand .txt strong{
+      display:block;
+      letter-spacing:.14em;
+      text-transform: uppercase;
+      font-size: 13px;
+      color: rgba(255,255,255,.92);
+    }
+    .brand .txt span{
+      display:block;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(61,185,235,.82);
+      letter-spacing:.06em;
+      margin-top:2px;
+    }
+    .badge{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(61,185,235,.18);
+      background: rgba(6,17,38,.35);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.25) inset;
+      color: rgba(255,255,255,.76);
+      display:flex; align-items:center; gap:10px;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background: rgba(61,185,235,.88);
+      box-shadow: 0 0 16px rgba(61,185,235,.55);
+      animation:pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:.82}50%{transform:scale(1.25);opacity:1}}
+
+    main{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 10px 26px 44px;
+      display:grid;
+      grid-template-columns: 1fr 480px;
+      gap: 22px;
+      align-items:start;
+    }
+    @media (max-width: 980px){ main{grid-template-columns:1fr;} }
+
+    .left{
+      padding: 10px 2px;
+    }
+    .left h1{
+      margin: 10px 0 10px;
+      font-size: clamp(30px, 4vw, 44px);
+      letter-spacing:.02em;
+    }
+    .left p{
+      margin:0;
+      color: var(--muted);
+      line-height:1.65;
+      max-width: 70ch;
+      font-size: 15px;
+    }
+    .callouts{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 680px){ .callouts{grid-template-columns:1fr;} }
+    .callout{
+      border-radius: var(--radius);
+      border: 1px solid rgba(61,185,235,.16);
+      background: rgba(6,17,38,.26);
+      padding: 14px 14px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.18) inset;
+    }
+    .callout .k{
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing:.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.62);
+    }
+    .callout .v{
+      margin-top: 8px;
+      font-size: 16px;
+      color: rgba(255,255,255,.90);
+    }
+    .callout .v b{color: rgba(61,185,235,.92)}
+
+    .panel{
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(6,17,38,.78), rgba(6,17,38,.54));
+      border: 1px solid rgba(61,185,235,.22);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .panel::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(560px 240px at 25% 0%, rgba(61,185,235,.16), transparent 60%),
+                  radial-gradient(420px 280px at 85% 18%, rgba(0,72,151,.26), transparent 60%);
+      pointer-events:none;
+    }
+    .panelhead{
+      position:relative;
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid rgba(61,185,235,.18);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .panelhead h2{
+      margin:0;
+      font-size: 14px;
+      letter-spacing:.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.88);
+    }
+    .panelhead .sub{
+      margin-top: 6px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(61,185,235,.82);
+      letter-spacing:.06em;
+    }
+    .kbd{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(61,185,235,.18);
+      background: rgba(5,10,20,.35);
+      color: rgba(255,255,255,.74);
+      white-space:nowrap;
+    }
+    .panelbody{
+      position:relative;
+      padding: 18px;
+    }
+
+    .pinRow{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .pinDots{
+      display:flex; gap: 10px; align-items:center;
+    }
+    .dotBox{
+      width: 14px; height: 14px;
+      border-radius: 6px;
+      border: 1px solid rgba(61,185,235,.25);
+      background: rgba(5,10,20,.45);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.25) inset;
+    }
+    .dotBox.filled{
+      background: rgba(61,185,235,.65);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.25) inset, 0 0 16px rgba(61,185,235,.22);
+      border-color: rgba(61,185,235,.45);
+    }
+    .hintSmall{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255,255,255,.62);
+    }
+
+    .keypad{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .key{
+      border:none;
+      border-radius: 16px;
+      padding: 14px 0;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing:.06em;
+      color: rgba(255,255,255,.92);
+      background: rgba(5,10,20,.55);
+      border: 1px solid rgba(61,185,235,.18);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.22) inset;
+      cursor:pointer;
+      transition: transform .10s ease, filter .10s ease, border-color .10s ease, box-shadow .10s ease;
+      user-select:none;
+    }
+    .key:hover{
+      transform: translateY(-1px);
+      border-color: rgba(61,185,235,.38);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.22) inset, 0 0 18px rgba(61,185,235,.12);
+      filter: brightness(1.06);
+    }
+    .key:active{ transform: translateY(0px); filter: brightness(.98); }
+
+    .key.alt{
+      font-size: 13px;
+      font-family: var(--mono);
+      font-weight: 700;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+    }
+    .key.primary{
+      background: linear-gradient(180deg, rgba(61,185,235,.30), rgba(0,72,151,.20));
+      border: 1px solid rgba(61,185,235,.34);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.25) inset, var(--glow);
+    }
+
+    .msg{
+      margin-top: 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.55;
+      padding: 10px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(61,185,235,.16);
+      background: rgba(5,10,20,.40);
+      color: rgba(255,255,255,.70);
+      display:none;
+    }
+    .msg.error{
+      border-color: rgba(255,90,90,.35);
+      box-shadow: 0 0 18px rgba(255,90,90,.08);
+      color: rgba(255,220,220,.88);
+    }
+    .msg.ok{
+      border-color: rgba(100,255,190,.28);
+      box-shadow: 0 0 18px rgba(100,255,190,.09);
+      color: rgba(220,255,240,.92);
+    }
+    .successBox{
+      margin-top: 14px;
+      border-radius: 18px;
+      padding: 14px 14px;
+      border: 1px solid rgba(100,255,190,.28);
+      background: linear-gradient(180deg, rgba(100,255,190,.12), rgba(6,17,38,.32));
+      box-shadow: 0 0 18px rgba(100,255,190,.10);
+      display:none;
+    }
+    .successBox strong{
+      display:block;
+      letter-spacing:.12em;
+      text-transform: uppercase;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: rgba(220,255,240,.95);
+    }
+    .successBox span{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(220,255,240,.88);
+    }
+
+    footer{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 26px 22px;
+      color: rgba(255,255,255,.45);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing:.03em;
+    }
+    .trainingNote{
+      margin-top: 14px;
+      border-radius: 18px;
+      padding: 12px 12px;
+      border: 1px solid rgba(61,185,235,.14);
+      background: rgba(6,17,38,.22);
+      color: rgba(255,255,255,.70);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .trainingNote em{ color: rgba(61,185,235,.92); font-style: normal; font-family: var(--mono); }
+  </style>
+</head>
+<body>
+  <div class="grid" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+  <img src="electra-logo.png" alt="Electra"
+       style="width:155px;height:86px;display:block;">
+      <div class="txt">
+        <strong>Electra Lockbox Console</strong>
+        <span>Accès sécurisé · Verrouillage local</span>
+      </div>
+    </div>
+
+    <div class="badge" role="status" aria-live="polite">
+      <span class="dot" aria-hidden="true"></span>
+      <span id="status">VERROUILLÉ · PIN REQUIS</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="left">
+      <h1>Accès par code PIN</h1>
+      <p>
+        Cette console protège l’accès à une ressource interne sensible.
+        Veuillez saisir le <b>PIN à 4 chiffres</b> pour déverrouiller la session.
+      </p>
+
+      <div class="callouts">
+        <div class="callout">
+          <div class="k">Module</div>
+          <div class="v"><b>LOCKBOX</b> · Local Vault</div>
+        </div>
+        <div class="callout">
+          <div class="k">Politique</div>
+          <div class="v">Accès <b>temporaire</b> · Journalisé</div>
+        </div>
+        <div class="callout">
+          <div class="k">Contexte</div>
+          <div class="v">Site industriel · <b>OT‑DMZ</b></div>
+        </div>
+        <div class="callout">
+          <div class="k">État</div>
+          <div class="v"><b>VERROUILLÉ</b> · Attente PIN</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="Console PIN">
+      <div class="panelhead">
+        <div>
+          <h2>Console de déverrouillage</h2>
+          <div class="sub">Saisie du code PIN</div>
+        </div>
+        <div class="kbd">PIN · 4 chiffres</div>
+      </div>
+
+      <div class="panelbody">
+        <div class="pinRow">
+          <div class="pinDots" aria-label="Progression PIN">
+            <div class="dotBox" id="d0"></div>
+            <div class="dotBox" id="d1"></div>
+            <div class="dotBox" id="d2"></div>
+            <div class="dotBox" id="d3"></div>
+          </div>
+          <div class="hintSmall" id="pinPreview">----</div>
+        </div>
+
+        <div class="keypad" role="group" aria-label="Clavier numérique">
+          <button class="key" data-k="1">1</button>
+          <button class="key" data-k="2">2</button>
+          <button class="key" data-k="3">3</button>
+          <button class="key" data-k="4">4</button>
+          <button class="key" data-k="5">5</button>
+          <button class="key" data-k="6">6</button>
+          <button class="key" data-k="7">7</button>
+          <button class="key" data-k="8">8</button>
+          <button class="key" data-k="9">9</button>
+          <button class="key alt" id="clear">effacer</button>
+          <button class="key" data-k="0">0</button>
+          <button class="key primary" id="unlock">Déverrouiller</button>
+        </div>
+
+        <div id="msg" class="msg" role="alert"></div>
+        <div id="success" class="successBox" aria-live="polite">
+          <strong>Déverrouillage réussi</strong>
+          <span>Accès accordé · Session ouverte · Journalisation active</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    ELECTRA · Confidentiel · Accès non autorisé interdit · © Electra Energy Systems
+  </footer>
+
+  <script>
+    // IMPORTANT : configuration d'entraînement
+    // Remplace PIN_CODE par celui que tu affiches sur ton “indice” (post‑it simulé).
+    const PIN_CODE = "4630";
+
+    const status = document.getElementById("status");
+    const msg = document.getElementById("msg");
+    const success = document.getElementById("success");
+    const preview = document.getElementById("pinPreview");
+    const dots = [document.getElementById("d0"), document.getElementById("d1"), document.getElementById("d2"), document.getElementById("d3")];
+
+    let pin = "";
+
+    function render() {
+      preview.textContent = (pin + "----").slice(0,4);
+      dots.forEach((d,i)=> d.classList.toggle("filled", i < pin.length));
+    }
+
+    function show(text, type) {
+      msg.classList.remove("error","ok");
+      msg.classList.add(type);
+      msg.textContent = text;
+      msg.style.display = "block";
+    }
+    function clearMsg() {
+      msg.style.display = "none";
+      msg.textContent = "";
+      msg.classList.remove("error","ok");
+    }
+
+    document.querySelectorAll(".key[data-k]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        clearMsg();
+        if (success.style.display === "block") return;
+        if (pin.length < 4) {
+          pin += btn.dataset.k;
+          render();
+        }
+      });
+    });
+
+    document.getElementById("clear").addEventListener("click", () => {
+      if (success.style.display === "block") return;
+      pin = "";
+      render();
+      clearMsg();
+      status.textContent = "VERROUILLÉ · PIN REQUIS";
+    });
+
+    document.getElementById("unlock").addEventListener("click", () => {
+      clearMsg();
+      if (pin.length !== 4) {
+        show("Veuillez saisir 4 chiffres.", "error");
+        return;
+      }
+      if (pin === PIN_CODE) {
+        show("PIN accepté. Déverrouillage en cours…", "ok");
+        status.textContent = "DÉVERROUILLAGE · EN COURS";
+        setTimeout(() => {
+          success.style.display = "block";
+          status.textContent = "DÉVERROUILLÉ · SESSION ACTIVE";
+        }, 650);
+      } else {
+        show("Code PIN incorrect. Réessayez.", "error");
+        status.textContent = "PIN INVALIDE · RÉESSAYER";
+        pin = "";
+        render();
+      }
+    });
+
+    // clavier physique (optionnel)
+    window.addEventListener("keydown", (e) => {
+      if (success.style.display === "block") return;
+      if (e.key >= "0" && e.key <= "9") {
+        if (pin.length < 4) {
+          pin += e.key;
+          render();
+        }
+      } else if (e.key === "Backspace") {
+        pin = pin.slice(0,-1);
+        render();
+      } else if (e.key === "Escape") {
+        pin = "";
+        render();
+      } else if (e.key === "Enter") {
+        document.getElementById("unlock").click();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
