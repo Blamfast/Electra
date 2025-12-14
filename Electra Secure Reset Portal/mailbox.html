@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Boîte mail – Employé Electra</title>
+<style>
+body{
+  margin:0;
+  background:#0b1020;
+  color:#fff;
+  font-family:system-ui, sans-serif;
+}
+.mailbox{
+  max-width:900px;
+  margin:40px auto;
+  background:#121a33;
+  border-radius:16px;
+  padding:24px;
+}
+.header{
+  border-bottom:1px solid #2a3a6a;
+  padding-bottom:12px;
+  margin-bottom:16px;
+}
+.subject{font-size:20px;font-weight:700}
+.meta{color:#9bb2ff;font-size:14px;margin-top:6px}
+.content{
+  margin-top:24px;
+  line-height:1.6;
+}
+.qr{
+  margin-top:24px;
+  display:flex;
+  gap:24px;
+  align-items:center;
+}
+.qr img{
+  width:180px;
+  height:180px;
+  background:#fff;
+  padding:10px;
+  border-radius:12px;
+}
+.note{
+  font-size:13px;
+  color:#c7d4ff;
+}
+</style>
+</head>
+<body>
+
+<div class="mailbox">
+  <div class="header">
+    <div class="subject">🔐 Action requise – Réinitialisation du mot de passe</div>
+    <div class="meta">
+      De : Electra Security &lt;no-reply@electra.local&gt;<br>
+      À : j.dupont@electra.local
+    </div>
+  </div>
+
+  <div class="content">
+    Une tentative de connexion inhabituelle a été détectée sur votre compte Electra.<br><br>
+    Pour sécuriser votre accès, veuillez scanner le QR code ci-dessous afin de modifier immédiatement votre mot de passe.
+  </div>
+
+  <div class="qr">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=reset.html">
+    <div class="note">
+      Ce QR code est personnel.<br>
+      Ne le partagez avec personne.
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

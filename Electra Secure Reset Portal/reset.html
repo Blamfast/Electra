@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Electra Secure Reset Portal</title>
+<style>
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#123,#050914);
+  color:#fff;
+  font-family:system-ui,sans-serif;
+}
+.card{
+  max-width:420px;
+  margin:120px auto;
+  background:#0f1833;
+  border-radius:18px;
+  padding:28px;
+  box-shadow:0 0 40px rgba(0,0,0,.6);
+}
+h1{
+  margin-top:0;
+  font-size:22px;
+}
+label{
+  display:block;
+  margin-top:18px;
+  font-size:14px;
+}
+input{
+  width:100%;
+  margin-top:6px;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #3db9eb;
+  background:#060c1e;
+  color:#fff;
+}
+button{
+  margin-top:24px;
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(180deg,#3db9eb,#004897);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Réinitialisation du mot de passe</h1>
+  <p>Veuillez définir un nouveau mot de passe pour votre compte Electra.</p>
+
+  <label>Nouveau mot de passe</label>
+  <input type="password">
+
+  <label>Confirmer le mot de passe</label>
+  <input type="password">
+
+  <button onclick="location.href='success.html'">
+    Modifier le mot de passe
+  </button>
+</div>
+
+</body>
+</html>
